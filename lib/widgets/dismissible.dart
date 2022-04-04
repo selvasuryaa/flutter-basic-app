@@ -16,23 +16,52 @@ class _DismissablesState extends State<Dismissables> {
       itemBuilder: (context, index) {
         final item = items[index];
         return Dismissible(
-          // Each Dismissible must contain a Key. Keys allow Flutter to
-          // uniquely identify widgets.
+          direction: DismissDirection.startToEnd,
+
           key: Key(item),
-          // Provide a function that tells the app
-          // what to do after an item has been swiped away.
+          confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Are you sure'),
+            content: Text('you want to delete this item from the Cart?'),
+            actions: [
+              TextButton(
+                child: Text('yes'),
+                onPressed: () {
+                      Navigator.of(ctx).pop(true);
+
+                },
+              ),
+              TextButton(
+                child: Text('No'),
+                onPressed: () {
+                      Navigator.of(ctx).pop(false);
+
+                },
+              ),
+            ],
+          ),
+        );
+      },
+
           onDismissed: (direction) {
-            // Remove the item from the data source.
             setState(() {
               items.removeAt(index);
             });
 
             // Then show a snackbar.
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(duration: Duration(milliseconds: 500),content: Text('$item dismissed')));
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                duration: Duration(milliseconds: 4000),
+                content: Text('$item dismissed')));
           },
           // Show a red background as the item is swiped away.
-          background: Container(color: Colors.red),
+          background: Container(
+              padding: EdgeInsets.only(left: 20),
+              alignment: Alignment.centerLeft,
+              child: Icon(Icons.delete),
+              color: Colors.red),
           child: ListTile(
             title: Text(item),
           ),
